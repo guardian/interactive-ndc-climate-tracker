@@ -1,0 +1,89 @@
+@import "fonts";
+// @import "enhanced_fonts";
+@import "mq";
+@import "palette";
+// @import "enhancer";
+// gu_grid pulls the css for gs-container and content__main-column
+// @import "gu_grid";
+
+.interactive-atom {
+    margin: 0;
+    padding: 0;
+}
+
+// for apps adds extra padding. Needed to make dark mode work
+.ios, .android {
+    .interactive-atom {
+        padding: 8px;
+    }
+}
+
+.ranking-1{fill:$live-blue;}
+.ranking-2{fill:$inverted-orange;}
+.ranking-3{fill:$highlight-yellow;}
+.ranking-4{fill:$highlight-dark;}
+.ranking-5{fill:$news-red;}
+.ranking-6{fill:$nav-dark;}
+.ranking-7{fill:$neutral-20;}
+
+.tooltip-map-list{
+        pointer-events: none;
+        min-width:150px;
+        max-width: 300px;
+        height: max-content;
+        padding:8px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid #333;
+        color: #333333;
+        border-top: 1px solid #333;
+        position: absolute;
+        z-index: 100000;
+        line-height: 18.2px;
+        cursor: pointer;
+
+        opacity:0;
+
+        &.over{
+            opacity: 1;
+        }
+
+        font-size: 14px;
+
+        @include fs-header(3);
+}
+
+#climate-tracker-map{
+	background: white;
+}
+
+.gv-text-section{
+
+    @include mq(leftCol) {
+        margin-left: 160px !important;
+    }
+    @include mq(wide) {
+        margin-left: 240px !important;
+    }
+
+    &:before {
+        position: absolute;
+        top: 0;
+    
+        height: 100%;
+        min-height: 500px;
+        content: ' ';
+    
+    
+        @include mq(leftCol) {
+            border-left:1px solid #dfdfdf;
+    
+          left: calc((100% - 1140px)/2 + 170px);
+        }
+    
+        @include mq(wide) {
+            border-left:1px solid #dfdfdf;
+    
+          left: calc((100% - 1300px)/2 + 250px);
+        }
+      }
+}
