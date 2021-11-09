@@ -77,11 +77,12 @@
 
 	min-width: 300px;
 	left: calc(50% - 150px);
-	//top: calc(50vh - 150px);
+	top: calc(50vh - 150px);
 
  	@include mq($from: 100px,  $until: 499px) {
 
 		top:calc( calc(100vh /2) + 25px);
+		left: 0;
 		
 	}
 } 

@@ -67,7 +67,7 @@ const bubbles = map.append('g')
 
 const scrolly = new ScrollyTeller({
     parent: document.querySelector("#scrolly-1"),
-    triggerTop: .5, // percentage from the top of the screen that the trigger should fire
+    triggerTop: .75, // percentage from the top of the screen that the trigger should fire
     triggerTopMobile: .75,
     transparentUntilActive: isMobile ? false : true
 });
@@ -95,9 +95,9 @@ let allData;
 let nodes = []
 	
 let simulation = d3.forceSimulation()
-.force("charge", d3.forceManyBody().strength(-50))
-.force("x1", d3.forceX().x(d => sufficiencyRatings.find(f => f.weight === d.rating).center[0]).strength(.08))
-.force("y1", d3.forceY().y(d => sufficiencyRatings.find(f => f.weight === d.rating).center[1]).strength(.08))
+.force("x", d3.forceX().x(d => sufficiencyRatings.find(f => f.weight === d.rating).center[0]).strength(.1))
+.force("y", d3.forceY().y(d => sufficiencyRatings.find(f => f.weight === d.rating).center[1]).strength(.1))
+.force( 'collide', d3.forceCollide().radius(d => d.emissions + 2).strength(0.8) )
 .alphaDecay(0)
 .velocityDecay(0.3)
 .on("tick", d => ticked())
@@ -108,8 +108,12 @@ console.log(simulation)
 let increase = 0
 
 const ticked = () => {
+	increase++;
 
-	if(increase > 1000)simulation.stop()
+	if(increase > 100){
+		simulation.stop()
+		increase = 0;
+	}
 
 	nodes.forEach(d => {
 
@@ -159,7 +163,7 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 			let cx = match.properties.centroid[0]
 			let cy = match.properties.centroid[1]
 
-			nodes.push({country_code:d.country_code, rating:d.rating, r:rad, x:cx, y:cy})
+			nodes.push({country_code:d.country_code, rating:d.rating, r:rad, x:cx, y:cy, emissions:rad})
 
 			bubbles.append('circle')
 			.attr('cx', cx)
@@ -169,13 +173,29 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 			
 		}
 		else if(!d.country_code){
-			console.log(d)
+
+			emissions = emissionsRaw.find(f => f.country_code === 'EUU');
+
+			let rad = radius(emissions.emissions)
+			let match = filtered.find(f => f.properties.ISO_A3 === 'ESP')
+			let cx = match.properties.centroid[0]
+			let cy = match.properties.centroid[1]
+
+			bubbles.append('circle')
+			.attr('cx', cx)
+			.attr('cy', cy)
+			.attr('r', rad)
+			.attr('class',  'EUU')
+
+			nodes.push({country_code:'EUU', rating:d.rating, r:rad, x:cx, y:cy, emissions:rad})
 		}
 
 
 	})
 
 	simulation.nodes(nodes)
+
+	console.log(nodes)
 
 	
 	allData.updateMapdataWTimestamps.forEach(data => {
