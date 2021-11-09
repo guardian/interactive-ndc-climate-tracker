@@ -2,7 +2,8 @@
 // @import "enhanced_fonts";
 @import "mq";
 @import "palette";
-// @import "enhancer";
+@import "scrolly";
+@import "enhancer";
 // gu_grid pulls the css for gs-container and content__main-column
 // @import "gu_grid";
 
@@ -13,35 +14,55 @@
 
 // for apps adds extra padding. Needed to make dark mode work
 .ios, .android {
-    .interactive-atom {
+    /* .interactive-atom {
         padding: 8px;
-    }
+    } */
 }
 
-.ranking-1{fill:$live-blue;}
-.ranking-2{fill:$inverted-orange;}
-.ranking-3{fill:$highlight-yellow;}
-.ranking-4{fill:$highlight-dark;}
-.ranking-5{fill:$news-red;}
-.ranking-6{fill:$nav-dark;}
-.ranking-7{fill:$neutral-20;}
+.interactive-wrapper{
+
+	@include mq(tablet) {
+	 	margin-left: -20px;
+	 }
+
+	 @include mq(desktop) {
+	 	margin-left:-21px;
+	 }
+
+	/* @include mq(leftCol) {
+	 	margin-left:-180px;
+	 }
+
+	 @include mq(wide) {
+	 	margin-left: -240px;
+	 } */
+
+}
+
+.ranking-1{fill:$live-blue; background: $live-blue;}
+.ranking-2{fill:$inverted-orange; background: $inverted-orange;}
+.ranking-3{fill:$highlight-yellow; background: $highlight-yellow;}
+.ranking-4{fill:$highlight-dark; background: $highlight-dark;}
+.ranking-5{fill:$news-red; background: $news-red;}
+.ranking-6{fill:$nav-dark; background: $nav-dark;}
+.ranking-7{fill:$neutral-20; background: $neutral-20;}
 
 .tooltip-map-list{
-        pointer-events: none;
+         pointer-events: none;
         min-width:150px;
         max-width: 300px;
         height: max-content;
         padding:8px;
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid #333;
-        color: #333333;
-        border-top: 1px solid #333;
+        background: rgba(51, 51, 51, 0.9);
+        border: 2px solid black;
+        color: #FFFFFF;
         position: absolute;
         z-index: 100000;
         line-height: 18.2px;
         cursor: pointer;
+        font-size: 14px;
 
-        opacity:0;
+       	opacity:0;
 
         &.over{
             opacity: 1;
@@ -51,6 +72,68 @@
 
         @include fs-header(3);
 }
+
+.scroll-text{
+
+	min-width: 300px;
+	left: calc(50% - 150px);
+	//top: calc(50vh - 150px);
+
+ 	@include mq($from: 100px,  $until: 499px) {
+
+		top:calc( calc(100vh /2) + 25px);
+		
+	}
+} 
+
+.scroll-text__div {
+
+
+	h2{
+		margin:0;
+		@include fs-header(5); margin-bottom: 8px;
+	    width: 100%;
+	    margin-left: 0;
+	    background-color: #ffffff !important;
+	    margin-bottom: 1rem;
+		font-family: GuardianTextEgyptian,Guardian Text Egyptian Web,Georgia,serif;
+		font-size: 18px;
+		line-height: 21px;
+		background-color: #333333;
+	}
+
+
+	max-width: 330px;
+
+	@include mq($from: 100px, $until: 499px) {
+		max-width: 100%;
+	}
+
+
+	width: 100%;
+	text-align: left;
+	margin-left: 0px;
+	padding: 6px 10px 0px;
+	padding-top: 6px;
+	padding-bottom: 0px;
+	font-size: 28px;
+	line-height: 32px;
+	font-family: "Guardian Headline","Guardian Egyptian Web","Guardian Headline Full",Georgia,serif;
+	font-weight: normal;
+	color: #000;
+	font-size: 16px;
+	line-height: 22px;
+	position: relative;
+	padding-top: 4px;
+	padding-bottom: 6px;
+	box-sizing: border-box;
+	-webkit-transform: translate3d(0, 0, 0);
+	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.15);
+	padding: 18px 20px 18px 23px;
+	border-radius: 3px;
+	border:rgba(0,0,0,.5)
+}
+
 
 #climate-tracker-map{
 	background: white;
@@ -83,7 +166,31 @@
         @include mq(wide) {
             border-left:1px solid #dfdfdf;
     
-          left: calc((100% - 1300px)/2 + 250px);
+          	left: calc((100% - 1300px)/2 + 250px);
         }
       }
 }
+
+
+.key-container{
+	width: 100%;
+	display:flex;
+	@include fs-textSans(1);
+	flex-direction:row;
+	position: absolute;
+
+	p{
+		@include fs-textSans(1);
+		font-weight: 900;
+		margin-bottom: 5px;
+	}
+
+	@include mq($from: 100px,  $until: 499px) {
+        flex-direction:column;
+        position: relative;
+    }
+}
+
+.key-color{width: 17px; max-height:20px; border-radius: 25px; margin-right: 5px;}
+.key-color-container{display:flex;	 margin-right: 12px; margin-bottom: 4px;}
+.analysed-countries{margin-bottom: 12px;}
