@@ -29,26 +29,18 @@
 	 	margin-left:-21px;
 	 }
 
-	/* @include mq(leftCol) {
-	 	margin-left:-180px;
-	 }
-
-	 @include mq(wide) {
-	 	margin-left: -240px;
-	 } */
-
 }
 
-.ranking-1{fill:$live-blue; background: $live-blue;}
-.ranking-2{fill:$inverted-orange; background: $inverted-orange;}
-.ranking-3{fill:$highlight-yellow; background: $highlight-yellow;}
-.ranking-4{fill:$highlight-dark; background: $highlight-dark;}
-.ranking-5{fill:$news-red; background: $news-red;}
-.ranking-6{fill:$nav-dark; background: $nav-dark;}
-.ranking-7{fill:$neutral-20; background: $neutral-20;}
+.rating-1{fill:$green-dark; background: $green-dark;}
+.rating-2{fill:$highlight-yellow; background: $highlight-yellow;}
+.rating-3{fill:$inverted-orange; background: $inverted-orange;}
+.rating-4{fill:$neutral-7; background: $neutral-7;}
+.rating-5{fill:$green-main; background: $green-main;}
+.rating-6{fill:$live-blue; background: $live-blue;}
+.rating-7{fill:$neutral-20; background: $neutral-20;}
 
 .tooltip-map-list{
-         pointer-events: none;
+        //pointer-events: none;
         min-width:150px;
         max-width: 300px;
         height: max-content;
@@ -62,7 +54,7 @@
         cursor: pointer;
         font-size: 14px;
 
-       	opacity:0;
+       	//opacity:0;
 
         &.over{
             opacity: 1;
@@ -70,7 +62,15 @@
 
         font-size: 14px;
 
-        @include fs-header(3);
+        p{
+        	margin:0;
+        	padding: 0;
+        }
+
+
+        .tooltip-country{@include fs-header(3);}
+        .tooltip-rating{@include fs-header(1);}
+        .tooltip-date{@include fs-textSans(1);}
 }
 
 .scroll-text{
@@ -188,10 +188,11 @@
 
 	@include mq($from: 100px,  $until: 499px) {
         flex-direction:column;
-        position: relative;
     }
 }
 
 .key-color{width: 17px; max-height:20px; border-radius: 25px; margin-right: 5px;}
 .key-color-container{display:flex;	 margin-right: 12px; margin-bottom: 4px;}
 .analysed-countries{margin-bottom: 12px;}
+
+
