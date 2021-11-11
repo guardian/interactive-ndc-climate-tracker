@@ -18,7 +18,7 @@ const isMobile = window.matchMedia('(max-width: 600px)').matches;
 const width = atomEl.getBoundingClientRect().width;
 const height = window.innerHeight;
 
-const margin = {top:25, right:5, bottom:25, left: 0}
+const margin = {top:d3.select('.analysed-countries').node().getBoundingClientRect().height, right:5, bottom:25, left: 0}
 
 let projection = d3.geoRobinson();
 
@@ -55,19 +55,14 @@ const map = d3.select('.map-container')
 
 const tooltip = d3.select('.tooltip-map-list')
 
-const admin = d3.select('.tooltip-country');
-const ndc = d3.select('.tooltip-ndc-rating');
-const ndcDate = d3.select('.tooltip-ndc-date');
-const pledge = d3.select('.tooltip-pledge');
-const pledgeDate = d3.select('.tooltip-pledge-date');
 
 const geo = map.append('g')
 const bubbles = map.append('g')
 
 const scrolly = new ScrollyTeller({
     parent: document.querySelector("#scrolly-1"),
-    triggerTop: .75, // percentage from the top of the screen that the trigger should fire
-    triggerTopMobile: .75,
+    triggerTop: 0.5, // percentage from the top of the screen that the trigger should fire
+    triggerTopMobile: 1	,
     transparentUntilActive: isMobile ? false : true
 });
 
@@ -82,16 +77,30 @@ const mapRatings = [
 
 const sufficiencyRatings = [
 {weight: 0, name: 'No data', center: [-1000, -1000]},
-{weight: 1, name: 'Critically insufficient', center: isMobile ? [width / 2, height / 5] : [width / 5, height / 2]},
-{weight: 2, name: 'Highly insufficient', center: isMobile ? [width / 2, (height / 5) * 2] : [(width / 5) * 2, height / 2]},
-{weight: 3, name: 'Insufficient', center: isMobile ? [width / 2, (height / 5) * 3] :[(width / 5) * 3, height / 2]},
-{weight: 4, name: 'Almost Sufficient', center: isMobile ? [width / 2, (height / 5) * 4] : [(width / 5) * 4, height / 2]},
-{weight: 5, name: 'Paris Agreement compatible', center: isMobile ? [width / 2, (height / 5) * 5] : [(width / 5) * 5, height / 2]}
+{weight: 1, name: 'Critically insufficient', center: isMobile ? [width / 2, (height + margin.top) / 6] : [width / 6, height / 2]},
+{weight: 2, name: 'Highly insufficient', center: isMobile ? [width / 2, ((height + margin.top) / 6) * 2] : [(width / 6) * 2, height / 2]},
+{weight: 3, name: 'Insufficient', center: isMobile ? [width / 2, ((height + margin.top) / 6) * 3] :[(width / 6) * 3, height / 2]},
+{weight: 4, name: 'Almost Sufficient', center: isMobile ? [width / 2, ((height + margin.top) / 6) * 4] : [(width / 6) * 4, height / 2]},
+{weight: 5, name: 'Paris Agreement compatible', center: isMobile ? [width / 2, ((height + margin.top) / 6) * 5] : [(width / 6) * 5, height / 2]}
 ]
+
+sufficiencyRatings.forEach(d => {
+
+	d3.select('#header-' + d.weight)
+	.style('top', isMobile ? (d.center[1] - 30) + 'px' : (d.center[1] - 110) + 'px')
+	.style('left', isMobile ? '5px' : (d.center[0] - 50) + 'px')
+
+})
+
+
+/*d3.select('.scroll-wrapper')
+.style('height', (d3.selectAll('.scroll-text__inner').nodes()[0].getBoundingClientRect().height * d3.selectAll('.scroll-text__inner').nodes().length) + 'px')*/
 	
 let allData;
 
 let nodes = []
+
+let eu = []
 	
 let simulation = d3.forceSimulation()
 .force("cx", d3.forceX().x(d => sufficiencyRatings.find(f => f.weight === d.sufficiency).center[0]).strength(.08))
@@ -124,6 +133,8 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 
 	allData = data;
 
+	allData.updateMapdataWTimestamps.forEach(f => {if(f.name === 'The Gambia'){console.log(f)}})
+
 	let sufficiency = allData.sufficiencyMapdataWTimestamps;
 
 	sufficiency.forEach(d => {
@@ -142,8 +153,6 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 		}
 		else if(!d.country_code){
 
-			console.log(d)
-
 			emissions = emissionsRaw.find(f => f.country_code === 'EUU');
 
 			let rad = radius(emissions.emissions)
@@ -157,19 +166,31 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 
 	})
 
-	
-
 	allData.updateMapdataWTimestamps.forEach(data => {
+
+		
+
+		data.name == 'EU' ? eu.push(data.country_code) : ''
 
 		let node = nodes.find(f => f.country_code === data.country_code)
 
 		if(node){
 			node.rating = data.rating
+			node.dataDate = data.timestamp
+		}
 
-			let geoCountry = filtered.find(f => f.properties.ISO_A3 === data.country_code);
+		let geoCountry = filtered.find(f => f.properties.ISO_A3 === data.country_code);
 
-			geoCountry.properties.sufficiency = node.sufficiency;
-			geoCountry.properties.sufficiencyDate = node.sufficiencyDate;
+		if(geoCountry){
+
+			let suffMatch = sufficiency.find(f => f.country_code ===data.country_code)
+
+			if(suffMatch){
+
+				geoCountry.properties.sufficiency = suffMatch.rating;
+				geoCountry.properties.sufficiencyDate = suffMatch.timestamp;
+			}
+			
 		}
 
 		let match = filtered.find(f => f.properties.ISO_A3 === data.country_code)
@@ -186,15 +207,18 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 	.data(filtered)
 	.enter()
 	.append('path')
-	.attr('class', d => 'country-stroke ' + d.properties.ISO_A3 + ' rating-' + d.properties.rating)
+	.attr('class', d => {
+
+		console.log(d.properties.ISO_A3,  d.properties.rating)
+		return'country-stroke ' + d.properties.ISO_A3 + ' rating-' + d.properties.rating
+	})
 	.attr('d', path)
 	.attr('fill', '#DADADA')
-	.attr('stroke-width', d => isMobile ? 0.5 : 1.5)
+	.attr('stroke-width', 1)
 	.filter(d => d.properties.rating)
 	.on('mousemove', (e,d) => manageMove(e))
 	.on('mouseover', (e,d) => {
 		    manageOver(e, d)
-		    tooltip.classed('over', true)
 	})
 	.on('mouseout', () => manageOut())
 
@@ -204,20 +228,34 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
     .attr("class", "subunit-boundary")
 	.attr('stroke', '#fff')
 	.attr('fill', 'none')
-	.attr('stroke-width', d => isMobile ? 0.5 : 1)
+	.attr('stroke-width', 1)
+
+	geo.append("path")
+	.datum(topojson.merge(worldMap, worldMap.objects['world-map-crimea-ukr'].geometries.filter(f => eu.indexOf(f.properties.ISO_A3) != -1)))
+	.attr("d", path)
+	.attr('class', 'country-stroke eu-border')
+	.attr('fill', 'none')
+	.attr('stroke-width', 1)
+
+
+
+//.datum(topojson.merge(us, us.objects.states.geometries.filter(function(d) { return selected.has(d.id); })))
+console.log(worldMap.objects['world-map-crimea-ukr'].geometries.filter(f => eu.indexOf(f.properties.ISO_A3) != -1))
+
 
 	bubbles.selectAll('circle')
 	.data(nodes)
 	.enter()
 	.append('circle')
-	.attr('class', d => d.country_code + ' rating-' + d.rating )
+	.attr('class', d => d.country_code + ' bubble rating-' + d.rating )
 	.attr('cx', d => d.centroid[0])
 	.attr('cy', d => d.centroid[1])
 	.attr('r', 0)
+	.attr('stroke', '#fff')
+	.attr('stroke-width', 1)
 	.on('mousemove', (e,d) => manageMove(e))
 	.on('mouseover', (e,d) => {
 		    manageOver(e, d)
-		    tooltip.classed('over', true)
 	})
 	.on('mouseout', () => manageOut())
 
@@ -271,7 +309,49 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 		geo.selectAll('.country-stroke')
 		.attr('stroke', 'none')
 
+		geo.selectAll('.eu-border')
+		.raise()
+		.attr('stroke', '#333')
+
+		geo
+		.selectAll('path')
+		.attr('opacity', 1)
+		.attr('transform', `scale(1)`)
+	}})
+	scrolly.addTrigger({num:5, do: () => {
+
+		geo.selectAll('.country-stroke')
+		.attr('stroke', 'none')
+
+		geo.selectAll('.IND')
+		.raise()
+		.attr('stroke', '#333')
+
+		geo
+		.selectAll('path')
+		.attr('opacity', 1)
+		.attr('transform', `scale(1)`)
+	}})
+	scrolly.addTrigger({num:6, do: () => {
+
+		geo.selectAll('.country-stroke')
+		.attr('stroke', 'none')
+
 		geo.selectAll('.BRA')
+		.raise()
+		.attr('stroke', '#333')
+
+		geo
+		.selectAll('path')
+		.attr('opacity', 1)
+		.attr('transform', `scale(1)`)
+	}})
+	scrolly.addTrigger({num:7, do: () => {
+
+		geo.selectAll('.country-stroke')
+		.attr('stroke', 'none')
+
+		geo.selectAll('.AUS')
 		.raise()
 		.attr('stroke', '#333')
 
@@ -291,9 +371,15 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 		d3.select('.non-analysed-countries')
 		.style('display', 'block')
 
+		d3.select('.analysed-countries p')
+		.style('display', 'block')
+
+		d3.select('.blobs-furniture')
+		.style('display', 'none')
+
 		
 	}})
-	scrolly.addTrigger({num:5, do: () => {
+	scrolly.addTrigger({num:8, do: () => {
 
 		geo.selectAll('.country-stroke')
 		.attr('stroke', 'none')
@@ -331,6 +417,12 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 		d3.select('.non-analysed-countries')
 		.style('display', 'none')
 
+		d3.select('.analysed-countries p')
+		.style('display', 'none')
+
+		d3.select('.blobs-furniture')
+		.style('display', 'block')
+
 
 	}})
 
@@ -341,17 +433,16 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 const manageOut = () => {
 
 	tooltip.classed('over', false)
-	admin.html('')
-	ndc.html('')
-	ndcDate.html('')
-	pledge.html('')
-	pledgeDate.html('')
+	tooltip.html('')
 
 	geo.select('.subunit-boundary')
 	.raise()
 
 	geo.selectAll('.country-stroke')
 	.attr('stroke', 'none')
+
+	bubbles.selectAll('.bubble')
+	.attr('stroke', '#fff')
 }
 
 const manageOver = (event, data) => {
@@ -364,10 +455,13 @@ const manageOver = (event, data) => {
 
 	if(data.properties)
 	{
+
+		let suffData = sufficiencyRatings.find(f => f.weight === data.properties.sufficiency)
+
 		country = data.properties.ADMIN;
 		ratingText = mapRatings.find(f => f.rating === data.properties.rating).text;
 		dataDate = data.properties.dataDate
-		sufficiencyText = sufficiencyRatings.find(f => f.weight === data.properties.sufficiency).name
+		sufficiencyText = suffData ? suffData.name : ''
 		sufficiencyDate = data.properties.sufficiencyDate
 
 		geo.selectAll('.' + data.properties.ISO_A3)
@@ -376,47 +470,36 @@ const manageOver = (event, data) => {
 	}
 	else{
 
+
+		let suffData = sufficiencyRatings.find(f => f.weight === data.sufficiency)
+
 		if(data.country_code !=  'EUU')country = filtered.find(f => f.properties.ISO_A3 === data.country_code).properties.ADMIN;
 		else country = 'EU'
 
 		ratingText = mapRatings.find(f => f.rating === data.rating).text;
-		dataDate = data.dataDate;
+		dataDate = data.dataDate
+		sufficiencyText = suffData ? suffData.name : ''
 		sufficiencyDate = data.sufficiencyDate
-	}
 
-	if(dataDate)ndcDate.html()
-
-
-
-	admin.html(`<p class='tooltip-country'>${country}</p>
-		<p class='tooltip-rating'>${ratingText}</p<br>
-		<p class='tooltip-date'>Last updated ${dataDate}</p>
-		${country}'s latest pledge is ${sufficiencyText}
-		<p class='tooltip-date'>Last updated ${sufficiencyDate}</p>`)
-	
-
-
-
-	
-
-	
-
+		bubbles.select('.' + data.country_code)
+		.raise()
+		.attr('stroke', '#333')
 		
 
-	//admin.html(data.properties.ADMIN)
+	}
 
-	/*
-	let pledgeRaw = allData.sufficiencyMapdataWTimestamps.find(f => f.country_code === data.country_code);
-	let pledgeRating = pledgeRaw == undefined ? '' : pledgeRaw.rating;
-	let pledgeText = pledgeRating == '' ? '' : sufficiencyRatings.find(f => f.weight === pledgeRating).name;
+	country = country == 'United States of America' ? 'US' : country
+	country = country == 'United Kingdom' ? 'UK' : country
+	country = country == 'United Arab Emirates' ? 'UAE' : country
 
-	let ndcDateRaw = allData.updateMapdataWTimestamps.find(f => f.country_code === data.country_code).timestamp;
 
+	tooltip.html(`
+		<p class='tooltip-country'>${country} ${ratingText}</p>
+		<p class='tooltip-date'>${dataDate ? 'Last updated ' + dataDate : ''}</p>
+		<p class='tooltip-country'>${sufficiencyText ? country + "'s latest pledge is " + sufficiencyText : ''}</p>
+		<p class='tooltip-date'>${sufficiencyDate ? 'Last updated ' + sufficiencyDate : ''}</p>
+	`)
 	
-	ndc.html(ratingText)
-	ndcDate.html('xx/xx/xxxx last update')
-	pledge.html(pledgeText)
-	pledgeDate.html('xx/xx/xxxx last update')*/
 }
 
 const manageMove = (event) => {
@@ -436,7 +519,7 @@ const manageMove = (event) => {
     if(posX + tWidth > width) posX = width - tWidth;
     if(posX < margin.left) posX = margin.left;
 
-    if(!isMobile && posY + tHeight > height) posY = posY - tHeight - 25;
+    if(posY + tHeight > height) posY = posY - tHeight - 25;
     if(posY < 0) posY = 0;
 
     tooltip.style('left',  posX + 'px')
@@ -446,6 +529,6 @@ const manageMove = (event) => {
 
 window.onresize = (event) => {
 
-    svg.style('height', window.innerHeight + 'px')
+    map.style('height', window.innerHeight + 'px')
          
 }

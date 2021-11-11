@@ -22,7 +22,7 @@
 .interactive-wrapper{
 
 	@include mq(tablet) {
-	 	margin-left: -20px;
+	 	margin-left: -21px;
 	 }
 
 	 @include mq(desktop) {
@@ -40,7 +40,7 @@
 .rating-7{fill:$neutral-20; background: $neutral-20;}
 
 .tooltip-map-list{
-        //pointer-events: none;
+        pointer-events: none;
         min-width:150px;
         max-width: 300px;
         height: max-content;
@@ -54,7 +54,7 @@
         cursor: pointer;
         font-size: 14px;
 
-       	//opacity:0;
+       	opacity:0;
 
         &.over{
             opacity: 1;
@@ -77,14 +77,17 @@
 
 	min-width: 300px;
 	left: calc(50% - 150px);
-	top: calc(50vh - 150px);
+	//top: calc(50vh - 150px);
+	//top: 100vh;
 
  	@include mq($from: 100px,  $until: 499px) {
 
-		top:calc( calc(100vh /2) + 25px);
+		//top:calc( calc(100vh /2) + 25px);
 		left: 0;
 		
 	}
+
+	/* .scroll-text__inner{margin-bottom: 100vh;} */
 } 
 
 .scroll-text__div {
@@ -137,10 +140,12 @@
 
 
 #climate-tracker-map{
+	overflow: hidden !important; 
 	background: white;
+	border:1px solid red;
 }
 
-.gv-text-section{
+/* .gv-text-section{
 
     @include mq(leftCol) {
         margin-left: 160px !important;
@@ -161,7 +166,7 @@
         @include mq(leftCol) {
             border-left:1px solid #dfdfdf;
     
-          left: calc((100% - 1140px)/2 + 170px);
+          	left: calc((100% - 1140px)/2 + 170px);
         }
     
         @include mq(wide) {
@@ -170,7 +175,7 @@
           	left: calc((100% - 1300px)/2 + 250px);
         }
       }
-}
+} */
 
 
 .key-container{
@@ -184,6 +189,8 @@
 		@include fs-textSans(1);
 		font-weight: 900;
 		margin-bottom: 5px;
+		margin: 0;
+		margin-bottom: 8px;
 	}
 
 	@include mq($from: 100px,  $until: 499px) {
@@ -194,5 +201,15 @@
 .key-color{width: 17px; max-height:20px; border-radius: 25px; margin-right: 5px;}
 .key-color-container{display:flex;	 margin-right: 12px; margin-bottom: 4px;}
 .analysed-countries{margin-bottom: 12px;}
+
+.blobs-furniture{display: none;}
+
+.blob-header{
+	@include fs-textSans(3);
+	font-weight: bold;position:
+	absolute;
+	width: 112px;
+	line-height: 17px;
+}
 
 

@@ -173,6 +173,11 @@
    "name": "Ethiopia",
    "country_code": "ETH",
    "emissions": 0.1
+ },
+ {
+   "name": "Gambia",
+   "country_code": "GMB",
+   "emissions": 0.2
  }
 
 ]
