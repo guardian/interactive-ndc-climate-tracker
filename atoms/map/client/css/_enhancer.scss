@@ -10,6 +10,19 @@
   margin: 0 !important;
 }
 
+.element-inline {
+
+  max-width: 620px;
+
+  @include mq(leftCol) {
+    margin-left: 160px !important;
+  }
+  @include mq(wide) {
+    margin-left: 240px !important;
+  }
+
+}
+
 .content--interactive .content__headline,
 .headline {
   font-size: 32px;
@@ -112,8 +125,8 @@ a,
   & > h2,
   & > ul,
   & > sub,
-  .element-interactive,
-  .element-atom,
+  // .element-interactive,
+  // .element-atom,
   .element-video {
     // strong {
     //   background-color: $highlight_yellow;
