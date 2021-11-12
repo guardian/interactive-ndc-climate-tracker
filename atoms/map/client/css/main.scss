@@ -214,11 +214,14 @@
 	@include mq($from: 100px,  $until: 499px) {
         flex-direction:column;
     }
+
+    #key-note{display: none;}
 }
 
 .key-color{width: 17px; max-height:20px; border-radius: 25px; margin-right: 5px;}
 .key-color-container{display:flex;	 margin-right: 12px; margin-bottom: 4px;}
 .analysed-countries{margin-bottom: 12px;}
+
 
 .blobs-furniture{display: none;}
 

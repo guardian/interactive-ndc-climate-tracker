@@ -412,6 +412,9 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 		d3.select('.blobs-furniture')
 		.style('display', 'none')
 
+		d3.select('#key-note')
+		.style('display', 'none')
+
 		labels
 		.style('display', 'none')
 
@@ -459,6 +462,9 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 		.style('display', 'none')
 
 		d3.select('.blobs-furniture')
+		.style('display', 'block')
+
+		d3.select('#key-note')
 		.style('display', 'block')
 
 		labels
@@ -539,6 +545,8 @@ const manageOver = (event, data) => {
 		bubbles.select('.' + data.country_code)
 		.attr('stroke', '#333')
 		.attr('stroke-width', '3px')
+
+
 		
 
 	}
