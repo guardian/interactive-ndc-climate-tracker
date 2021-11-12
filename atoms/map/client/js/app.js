@@ -55,9 +55,9 @@ const map = d3.select('.map-container')
 
 const tooltip = d3.select('.tooltip-map-list')
 
-
 const geo = map.append('g')
 const bubbles = map.append('g')
+const labels = map.append('g')
 
 const scrolly = new ScrollyTeller({
     parent: document.querySelector("#scrolly-1"),
@@ -101,6 +101,8 @@ let allData;
 let nodes = []
 
 let eu = []
+
+let labelsArray = ['CHN', 'USA', 'EUU', 'GBR', 'ARE', 'AUS', 'RUS']
 	
 let simulation = d3.forceSimulation()
 .force("cx", d3.forceX().x(d => sufficiencyRatings.find(f => f.weight === d.sufficiency).center[0]).strength(.08))
@@ -207,11 +209,7 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 	.data(filtered)
 	.enter()
 	.append('path')
-	.attr('class', d => {
-
-		console.log(d.properties.ISO_A3,  d.properties.rating)
-		return'country-stroke ' + d.properties.ISO_A3 + ' rating-' + d.properties.rating
-	})
+	.attr('class', d => 'country-stroke ' + d.properties.ISO_A3 + ' rating-' + d.properties.rating)
 	.attr('d', path)
 	.attr('fill', '#DADADA')
 	.attr('stroke-width', 1)
@@ -238,11 +236,6 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 	.attr('stroke-width', 1)
 
 
-
-//.datum(topojson.merge(us, us.objects.states.geometries.filter(function(d) { return selected.has(d.id); })))
-console.log(worldMap.objects['world-map-crimea-ukr'].geometries.filter(f => eu.indexOf(f.properties.ISO_A3) != -1))
-
-
 	bubbles.selectAll('circle')
 	.data(nodes)
 	.enter()
@@ -266,10 +259,34 @@ console.log(worldMap.objects['world-map-crimea-ukr'].geometries.filter(f => eu.i
 	    simulation.tick();
 	}
 
+	labels.selectAll('text')
+	.data(nodes.filter(f => labelsArray.indexOf(f.country_code) != -1))
+	.enter()
+	.append('text')
+	.attr('class', d => 'bubble-label')
+	.attr('transform', d => `translate(${d.x},${d.y})`)
+	.text(d => {
+		let name =d.country_code;
+
+		name === 'GBR' ? name = 'UK' : name
+		name === 'USA' ? name = 'US' : name
+		name === 'EUU' ? name = 'EU' : name
+		name === 'ARE' ? name = 'UAE' : name
+
+		return name
+	})
+
+	labels
+	.style('display', 'none')
+
+
 
 	scrolly.addTrigger({num:1, do: () => {
 		geo.selectAll('.country-stroke')
 		.attr('stroke', 'none')
+
+		geo.selectAll('.selected')
+		.classed('selected', false)
 
 		geo
 		.selectAll('path')
@@ -281,9 +298,12 @@ console.log(worldMap.objects['world-map-crimea-ukr'].geometries.filter(f => eu.i
 		geo.selectAll('.country-stroke')
 		.attr('stroke', 'none')
 
+		geo.selectAll('.selected')
+		.classed('selected', false)
+
 		geo.selectAll('.USA')
 		.raise()
-		.attr('stroke', '#333')
+		.classed('selected', true)
 
 		geo
 		.selectAll('path')
@@ -295,9 +315,12 @@ console.log(worldMap.objects['world-map-crimea-ukr'].geometries.filter(f => eu.i
 		geo.selectAll('.country-stroke')
 		.attr('stroke', 'none')
 
+		geo.selectAll('.selected')
+		.classed('selected', false)
+
 		geo.selectAll('.CHN')
 		.raise()
-		.attr('stroke', '#333')
+		.classed('selected', true)
 
 		geo
 		.selectAll('path')
@@ -309,9 +332,12 @@ console.log(worldMap.objects['world-map-crimea-ukr'].geometries.filter(f => eu.i
 		geo.selectAll('.country-stroke')
 		.attr('stroke', 'none')
 
+		geo.selectAll('.selected')
+		.classed('selected', false)
+
 		geo.selectAll('.eu-border')
 		.raise()
-		.attr('stroke', '#333')
+		.classed('selected', true)
 
 		geo
 		.selectAll('path')
@@ -323,9 +349,12 @@ console.log(worldMap.objects['world-map-crimea-ukr'].geometries.filter(f => eu.i
 		geo.selectAll('.country-stroke')
 		.attr('stroke', 'none')
 
+		geo.selectAll('.selected')
+		.classed('selected', false)
+
 		geo.selectAll('.IND')
 		.raise()
-		.attr('stroke', '#333')
+		.classed('selected', true)
 
 		geo
 		.selectAll('path')
@@ -337,9 +366,12 @@ console.log(worldMap.objects['world-map-crimea-ukr'].geometries.filter(f => eu.i
 		geo.selectAll('.country-stroke')
 		.attr('stroke', 'none')
 
+		geo.selectAll('.selected')
+		.classed('selected', false)
+
 		geo.selectAll('.BRA')
 		.raise()
-		.attr('stroke', '#333')
+		.classed('selected', true)
 
 		geo
 		.selectAll('path')
@@ -351,9 +383,12 @@ console.log(worldMap.objects['world-map-crimea-ukr'].geometries.filter(f => eu.i
 		geo.selectAll('.country-stroke')
 		.attr('stroke', 'none')
 
+		geo.selectAll('.selected')
+		.classed('selected', false)
+
 		geo.selectAll('.AUS')
 		.raise()
-		.attr('stroke', '#333')
+		.classed('selected', true)
 
 		geo
 		.selectAll('path')
@@ -375,6 +410,9 @@ console.log(worldMap.objects['world-map-crimea-ukr'].geometries.filter(f => eu.i
 		.style('display', 'block')
 
 		d3.select('.blobs-furniture')
+		.style('display', 'none')
+
+		labels
 		.style('display', 'none')
 
 		
@@ -423,6 +461,9 @@ console.log(worldMap.objects['world-map-crimea-ukr'].geometries.filter(f => eu.i
 		d3.select('.blobs-furniture')
 		.style('display', 'block')
 
+		labels
+		.style('display', 'block')
+
 
 	}})
 
@@ -436,6 +477,9 @@ const manageOut = () => {
 	tooltip.html('')
 
 	geo.select('.subunit-boundary')
+	.raise()
+
+	geo.selectAll('.selected')
 	.raise()
 
 	geo.selectAll('.country-stroke')
@@ -452,6 +496,7 @@ const manageOver = (event, data) => {
 	let dataDate;
 	let sufficiencyText;
 	let sufficiencyDate;
+	let append = '';
 
 	if(data.properties)
 	{
@@ -467,14 +512,24 @@ const manageOver = (event, data) => {
 		geo.selectAll('.' + data.properties.ISO_A3)
 		.raise()
 		.attr('stroke', '#333')
+
+		eu.indexOf(data.properties.ISO_A3) != -1 ? append = ' | Submitted through the EU' : ''
+
+
 	}
 	else{
 
 
 		let suffData = sufficiencyRatings.find(f => f.weight === data.sufficiency)
 
-		if(data.country_code !=  'EUU')country = filtered.find(f => f.properties.ISO_A3 === data.country_code).properties.ADMIN;
-		else country = 'EU'
+		if(data.country_code !=  'EUU'){
+
+			country = filtered.find(f => f.properties.ISO_A3 === data.country_code).properties.ADMIN;
+		}
+		else{
+
+			country = 'EU'
+		}
 
 		ratingText = mapRatings.find(f => f.rating === data.rating).text;
 		dataDate = data.dataDate
@@ -482,8 +537,8 @@ const manageOver = (event, data) => {
 		sufficiencyDate = data.sufficiencyDate
 
 		bubbles.select('.' + data.country_code)
-		.raise()
 		.attr('stroke', '#333')
+		.attr('stroke-width', '3px')
 		
 
 	}
@@ -495,8 +550,8 @@ const manageOver = (event, data) => {
 
 	tooltip.html(`
 		<p class='tooltip-country'>${country} ${ratingText}</p>
-		<p class='tooltip-date'>${dataDate ? 'Last updated ' + dataDate : ''}</p>
-		<p class='tooltip-country'>${sufficiencyText ? country + "'s latest pledge is " + sufficiencyText : ''}</p>
+		<p class='tooltip-date'>${dataDate ? 'Last updated ' + dataDate + append : ''}</p>
+		<p class='tooltip-country'>${sufficiencyText ? country + "'s latest pledge is " + sufficiencyText.toLowerCase() : ''}</p>
 		<p class='tooltip-date'>${sufficiencyDate ? 'Last updated ' + sufficiencyDate : ''}</p>
 	`)
 	
