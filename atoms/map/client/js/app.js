@@ -8,6 +8,7 @@ import emissionsRaw from 'assets/emissions.json'
 
 //https://interactive.guim.co.uk/2021/11/climate-tracker/mapdata.json
 
+console.log('VERSION 1.04')
 
 const d3 = Object.assign({}, d3B, topojson, geoProjection);
 
