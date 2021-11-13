@@ -6,10 +6,6 @@ import worldMap from 'assets/ne_10m_admin_0_countries_crimea_ukraine_simple.json
 import * as moment from 'moment'
 import emissionsRaw from 'assets/emissions.json'
 
-//https://interactive.guim.co.uk/2021/11/climate-tracker/mapdata.json
-
-console.log('VERSION 1.04')
-
 const d3 = Object.assign({}, d3B, topojson, geoProjection);
 
 const atomEl = d3.select('.ndc-interactive-wrapper').node()
@@ -19,7 +15,7 @@ const isMobile = window.matchMedia('(max-width: 600px)').matches;
 const width = atomEl.getBoundingClientRect().width;
 const height = window.innerHeight;
 
-const margin = {top:d3.select('.analysed-countries').node().getBoundingClientRect().height, right:5, bottom:25, left: 0}
+const margin = {top:100, right:5, bottom:0, left: 0}
 
 let projection = d3.geoRobinson();
 
@@ -76,13 +72,17 @@ const mapRatings = [
 {rating:6, text: 'proposed a new NDC target'}
 ]
 
+let verticalSpace = (height - margin.top - margin.bottom) / 5 ;
+
+console.log(verticalSpace)
+
 const sufficiencyRatings = [
 {weight: 0, name: 'No data', center: [-1000, -1000]},
-{weight: 1, name: 'Critically insufficient', center: isMobile ? [width / 2, (height + margin.top) / 6] : [width / 6, height / 2]},
-{weight: 2, name: 'Highly insufficient', center: isMobile ? [width / 2, ((height + margin.top) / 6) * 2] : [(width / 6) * 2, height / 2]},
-{weight: 3, name: 'Insufficient', center: isMobile ? [width / 2, ((height + margin.top) / 6) * 3] :[(width / 6) * 3, height / 2]},
-{weight: 4, name: 'Almost Sufficient', center: isMobile ? [width / 2, ((height + margin.top) / 6) * 4] : [(width / 6) * 4, height / 2]},
-{weight: 5, name: 'Paris Agreement compatible', center: isMobile ? [width / 2, ((height + margin.top) / 6) * 5] : [(width / 6) * 5, height / 2]}
+{weight: 1, name: 'Critically insufficient', center: isMobile ? [(width / 3)*2, verticalSpace + 40] : [width / 6, height / 2]},
+{weight: 2, name: 'Highly insufficient', center: isMobile ? [(width / 3)*2, (verticalSpace * 2) + 40] : [(width / 6) * 2, height / 2]},
+{weight: 3, name: 'Insufficient', center: isMobile ? [(width / 3)*2, (verticalSpace * 3) + 40] :[(width / 6) * 3, height / 2]},
+{weight: 4, name: 'Almost Sufficient', center: isMobile ? [(width / 3)*2, (verticalSpace * 4) + 40] : [(width / 6) * 4, height / 2]},
+{weight: 5, name: 'Paris Agreement compatible', center: isMobile ? [(width / 3)*2, (verticalSpace * 5) + 40] : [(width / 6) * 5, height / 2]}
 ]
 
 sufficiencyRatings.forEach(d => {
@@ -393,6 +393,8 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 
 		geo
 		.selectAll('path')
+		.transition()
+		.duration(500)
 		.attr('opacity', 1)
 		.attr('transform', `scale(1)`)
 
@@ -430,14 +432,30 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 		.selectAll('path')
 		.each(d => {
 
+			if(d.properties)
+			{
+				let match = nodes.find(f => f.country_code === d.properties.ISO_A3);
 
-			if(d.geometry){
-				d3.select('.' + d.properties.ISO_A3)
-				.transition()
-				.duration(1000)
-				.attr('transform', `translate(${d.properties.centroid[0]},${d.properties.centroid[1]}) scale(0)`)
-				.attr('opacity', 0)
+				if(match)
+				{
+					if(d.geometry){
+						d3.select('.' + d.properties.ISO_A3)
+						.transition()
+						.delay(500)
+						.duration(1000)
+						.attr('transform', `translate(${match.x},${match.y}) scale(0)`)
+						.attr('opacity', 0)
+					}
+				}
+				else{
+					d3.select('.' + d.properties.ISO_A3)
+					.transition()
+					.duration(1000)
+					.attr('transform', `translate(${d.properties.centroid[0]},${d.properties.centroid[1]}) scale(0)`) 
+					.attr('opacity', 0)
+				}
 			}
+
 		})
 
 		bubbles
@@ -546,6 +564,7 @@ const manageOver = (event, data) => {
 		bubbles.select('.' + data.country_code)
 		.attr('stroke', '#333')
 		.attr('stroke-width', '3px')
+		.raise()
 
 
 		
