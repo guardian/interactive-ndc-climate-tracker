@@ -2,7 +2,7 @@ import * as d3B from 'd3'
 import * as topojson from 'topojson'
 import * as geoProjection from 'd3-geo-projection'
 import ScrollyTeller from "shared/js/scrollyteller"
-import worldMap from 'assets/ne_10m_admin_0_countries_crimea_ukraine_simple.json'
+import worldMap from 'assets/countries_crimea_sahara.json'
 import * as moment from 'moment'
 import emissionsRaw from 'assets/emissions.json'
 
@@ -40,7 +40,7 @@ let extent = {
 projection
 .fitExtent([[0, 0], [width, height]], extent);
 
-const filtered = topojson.feature(worldMap, worldMap.objects['world-map-crimea-ukr']).features.filter(f => f.properties.ADMIN != 'Antarctica')
+const filtered = topojson.feature(worldMap, worldMap.objects['ne_10m_admin-0_countries_crimea_sahara']).features.filter(f => f.properties.ADMIN != 'Antarctica')
 
 const centroids = filtered.forEach(feature => feature.properties.centroid = path.centroid(feature))
 
@@ -198,8 +198,13 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 
 		let match = filtered.find(f => f.properties.ISO_A3 === data.country_code)
 
-		match.properties.rating = data.rating;
-		match.properties.dataDate = data.timestamp;
+		if(match)
+		{
+			match.properties.rating = data.rating;
+			match.properties.dataDate = data.timestamp;
+		}
+
+		
 	})
 
 
@@ -222,7 +227,7 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 	.on('mouseout', () => manageOut())
 
 	geo.append("path")
-    .datum(topojson.mesh(worldMap, worldMap.objects['world-map-crimea-ukr'], (a, b) => a !== b ))
+    .datum(topojson.mesh(worldMap, worldMap.objects['ne_10m_admin-0_countries_crimea_sahara'], (a, b) => a !== b ))
     .attr("d", path)
     .attr("class", "subunit-boundary")
 	.attr('stroke', '#fff')
@@ -230,7 +235,7 @@ d3.json('https://interactive.guim.co.uk/2021/11/climate-tracker/v2/mapdata.json'
 	.attr('stroke-width', 1)
 
 	geo.append("path")
-	.datum(topojson.merge(worldMap, worldMap.objects['world-map-crimea-ukr'].geometries.filter(f => eu.indexOf(f.properties.ISO_A3) != -1)))
+	.datum(topojson.merge(worldMap, worldMap.objects['ne_10m_admin-0_countries_crimea_sahara'].geometries.filter(f => eu.indexOf(f.properties.ISO_A3) != -1)))
 	.attr("d", path)
 	.attr('class', 'country-stroke eu-border')
 	.attr('fill', 'none')
